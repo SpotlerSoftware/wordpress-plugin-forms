@@ -1,9 +1,9 @@
 === MailPlus Forms ===
 Contributors: mailplus
-Donate link: http://www.mailplus.nl
+Donate link: https://www.spotler.com/software
 Tags: forms, mailplus
-Requires at least: 3.3
-Tested up to: 4.7
+Requires at least: 3.9
+Tested up to: 4.8
 Stable tag: trunk
 License: Modified BSD License
 
@@ -21,6 +21,11 @@ With the MailPlus Forms Plugin web masters can easily integrate web forms or onl
 4. Add a form in a post or a page through the "Add a MailPlus form" button in the HTML editor (TinyMCE)
 
 == Changelog ==
+
+= 1.1.0 =
+* Fix iconv_set_encoding deprecated warning
+* Upgrade TinyMCE plugin to TinyMCE v4. TinyMCE v3 is no longer supported.
+* Move all PHP logic the plugin core which fixes the plugin running on Wordpress installations with changed directories (e.d. Roots' Bedrock)
 
 = 1.0.6 =
 * Fix warnings while submitting a form

@@ -1,17 +1,17 @@
 <?php
 /*
 Plugin Name: MailPlus Forms
-Plugin URI: http://www.mailplus.nl
-Description: With the <strong>MailPlus Forms Plugin</strong> web masters can easily integrate web forms or online surveys created in <a href="http://www.mailplus.nl" target="_blank">MailPlus</a> on pages and posts without any technical knowledge. MailPlus is an online marketing platform which contains a user-friendly form editor with a lot of features. For example, matrix questions, conditional questions, skip logic/branching, multi-paging, extensive features for validating answers from respondents, great e-mail confirmation possibilities and much more. <strong>To get started:</strong> 1) Click the “Activate” link to the left of this description, 2) Go to your <a href="http://login.mailplus.nl" target="_blank">MailPlus</a> account to get your authorization codes, 3) Go to your <a href='options-general.php?page=mailplusforms'>plugin settings</a> and enter your API key and secret.
-Version: 1.0.6
-Author: MailPlus
-Author URI: http://www.mailplus.nl
+Plugin URI: https://www.spotler.com
+Description: With the <strong>MailPlus Forms Plugin</strong> web masters can easily integrate web forms or online surveys created in <a href="https://spotler.com/software/" target="_blank">MailPlus</a> on pages and posts without any technical knowledge. MailPlus is an online marketing platform which contains a user-friendly form editor with a lot of features. For example, matrix questions, conditional questions, skip logic/branching, multi-paging, extensive features for validating answers from respondents, great e-mail confirmation possibilities and much more. <strong>To get started:</strong> 1) Click the “Activate” link to the left of this description, 2) Go to your <a href="http://login.mailplus.nl" target="_blank">MailPlus</a> account to get your authorization codes, 3) Go to your <a href='options-general.php?page=mailplusforms'>plugin settings</a> and enter your API key and secret.
+Version: 1.1.0
+Author: Spotler Software
+Author URI: https://www.spotler.com
 License: Modified BSD license
 */
 
 /*  
 
-Copyright (c) MailPlus (email : info@mailplus.nl)
+Copyright (c) Spotler (email : info@spotler.com)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,15 +43,45 @@ require_once('mailplus_integration.php');
 define ('MPPLUGINNAME', 'MailPlus Forms');
 define ('MPPLUGINID', 'mailplusforms');
 
-
 add_action('admin_menu', 'mpforms_plugin_menu');
 add_action('init', 'mpforms_addbuttons');
 add_action('admin_init', 'mpforms_admin_init');
-
 add_action('send_headers', 'mpforms_handle_headers');
+add_action('template_redirect', 'mpforms_get_forms');
+
 add_shortcode('mailplusform', 'mpforms_shortcode');
 
+add_filter( 'query_vars', 'add_query_vars_filter' );
 
+function add_query_vars_filter( $vars ){
+    $vars[] = "mpforms_get_forms";
+    return $vars;
+}
+
+
+function mpforms_get_forms()
+{
+    if (get_query_var('mpforms_get_forms') != 1) {
+        return;
+    }
+
+    if (!is_user_logged_in()){
+        die('You must be logged in to access this script.');
+    }
+    header('Content-type: application/json');
+    $api = new mailplus_forms_api();
+    $forms = $api->get_forms();
+
+    $result = array();
+
+    foreach ($forms as $form) {
+        $row = array('id' => (int) $form->id, 'name' => (string) $form->name);
+        $result[] = $row;
+    }
+
+    echo json_encode($result);
+    exit;
+}
 
 function mpforms_plugin_menu() {
 	add_options_page(MPPLUGINNAME, MPPLUGINNAME, 'manage_options', MPPLUGINID, 'mpforms_options_page');
@@ -204,7 +234,7 @@ function mpforms_register_button($buttons) {
 }
 
 function mpforms_add_tinymce_plugin($plugins) {
-	$plugins['mpforms'] = plugins_url('/mailplus-forms/tinymce/editor_plugin.js.php');
+	$plugins['mpforms'] = plugins_url('/mailplus-forms/tinymce/editor_plugin.js');
 	return $plugins;
 }
 
