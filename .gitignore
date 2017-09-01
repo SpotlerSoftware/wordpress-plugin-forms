@@ -1,0 +1,11 @@
+/build
+/dist
+/.settings
+/temp
+/tmp.sonar
+/.sonar
+/testoutput
+/target
+.buildpath
+.project
+.idea
