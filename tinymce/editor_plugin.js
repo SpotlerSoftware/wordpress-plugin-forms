@@ -43,12 +43,13 @@ tinymce.PluginManager.add('mpforms', function(editor, url) {
 		});
 
         var listbox = win.find('#mpforms_select')[0];
-        jQuery.getJSON('/?mpforms_get_forms=1', function(data) {
+        jQuery.getJSON(ajaxurl + '?action=mpforms_get_forms', function(data) {
+            listbox.menu = null;
             jQuery.each(data, function(index, item){
-            	listbox.settings.values.push({text:  item.name, value: item.id});
-			});
+                listbox.settings.values.push({text:  item.name, value: item.id});
+            });
 
-		});
+        });
 
         function onSubmitForm() {
             var data = win.toJSON();
