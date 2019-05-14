@@ -47,27 +47,17 @@ add_action('admin_menu', 'mpforms_plugin_menu');
 add_action('init', 'mpforms_addbuttons');
 add_action('admin_init', 'mpforms_admin_init');
 add_action('send_headers', 'mpforms_handle_headers');
-add_action('template_redirect', 'mpforms_get_forms');
 
 add_shortcode('mailplusform', 'mpforms_shortcode');
 
-add_filter( 'query_vars', 'add_query_vars_filter' );
-
-function add_query_vars_filter( $vars ){
-    $vars[] = "mpforms_get_forms";
-    return $vars;
-}
-
+add_action('wp_ajax_mpforms_get_forms', 'mpforms_get_forms');
 
 function mpforms_get_forms()
 {
-    if (get_query_var('mpforms_get_forms') != 1) {
-        return;
-    }
-
-    if (!is_user_logged_in()){
+    if (!current_user_can('edit_posts') && !current_user_can('edit_pages')){
         die('You must be logged in to access this script.');
     }
+
     header('Content-type: application/json');
     $api = new mailplus_forms_api();
     $forms = $api->get_forms();
@@ -80,7 +70,7 @@ function mpforms_get_forms()
     }
 
     echo json_encode($result);
-    exit;
+    wp_die();
 }
 
 function mpforms_plugin_menu() {
@@ -240,19 +230,19 @@ function mpforms_add_tinymce_plugin($plugins) {
 
 function mp_forms_repair_post($data) {
 	// combine rawpost and $_POST ($data) to rebuild broken arrays in $_POST
-        $rawpost = "&".file_get_contents("php://input");
-        while(list($key,$value)= each($data)) {
-            $pos = preg_match_all("/&".$key."=([^&]*)/i",$rawpost, $regs, PREG_PATTERN_ORDER);       
-            if((!is_array($value)) && ($pos > 1)) {
-                $qform[$key] = array();
-                for($i = 0; $i < $pos; $i++) {
-                    $qform[$key][$i] = urldecode($regs[1][$i]);
-                }
-            } else {
-                $qform[$key] = $value;
+    $rawpost = "&".file_get_contents("php://input");
+    foreach ($data as $key => $value) {
+        $pos = preg_match_all("/&".$key."=([^&]*)/i",$rawpost, $regs, PREG_PATTERN_ORDER);
+        if((!is_array($value)) && ($pos > 1)) {
+            $qform[$key] = array();
+            for($i = 0; $i < $pos; $i++) {
+                $qform[$key][$i] = urldecode($regs[1][$i]);
             }
+        } else {
+            $qform[$key] = $value;
         }
-        return $qform; 
+    }
+    return $qform;
 }
 
 function mpforms_get_post_url($formid) {
@@ -306,7 +296,7 @@ function mpforms_handle_headers()
 
 /* SHORTCODE OPTIONS */
 function mpforms_shortcode($atts) {
-	global $mpforms_data;
+    global $mpforms_data;
 	extract( shortcode_atts( array(
 		'formid' => '',
 		'ssl' => 'false',
