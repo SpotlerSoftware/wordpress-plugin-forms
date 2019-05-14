@@ -1,0 +1,8 @@
+{
+  "name": "booreiland/mailplus-forms",
+  "type": "wordpress-plugin",
+  "repositories": [{
+      "type": "vcs",
+      "url": "git@github.com:Booreiland/wordpress-plugin-forms.git"
+  }]
+}
