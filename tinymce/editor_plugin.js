@@ -3,32 +3,32 @@ tinymce.PluginManager.add('mpforms', function(editor, url) {
 		return;
 	}
 
-	editor.addCommand('mpforms', function() {
-		showDialog();
-	});
+    editor.addCommand('mpforms', function() {
+        showDialog();
+    });
 
-	editor.addButton('mpforms', {
-		title : 'Add MailPlus form',
-		cmd : 'mpforms',
-		image : url + '/img/mpforms.png'
-	});
+    editor.addButton('mpforms', {
+        title : 'Add MailPlus form',
+        cmd : 'mpforms',
+        image : url + '/img/mpforms.png'
+    });
 
-	function showDialog() {
-		var win = editor.windowManager.open({
+    function showDialog() {
+        var win = editor.windowManager.open({
 			title: 'Add a MailPlus form',
 			body:[{
 				type: 'form',
-				//width: '400px',
+                //width: '400px',
 				layout : 'flex',
-				direction : 'column',
+                direction : 'column',
 
-				name: 'mpform_form',
-				defaults : {
-					type : 'formItem',
-					autoResize : "overflow",
-					flex : 1,
-					minWidth: 350
-				},
+                name: 'mpform_form',
+                defaults : {
+                    type : 'formItem',
+                    autoResize : "overflow",
+                    flex : 1,
+                    minWidth: 350
+                },
 				items: [
 					{
 						name: 'mpforms_select',
@@ -39,25 +39,25 @@ tinymce.PluginManager.add('mpforms', function(editor, url) {
 					}
 				]
 			}],
-			onSubmit : onSubmitForm
+            onSubmit : onSubmitForm
 		});
 
-		var listbox = win.find('#mpforms_select')[0];
-		jQuery.getJSON(ajaxurl + '?action=mpforms_get_forms', function(data) {
-			listbox.menu = null;
-			jQuery.each(data, function(index, item){
-				listbox.settings.values.push({text:  item.name, value: item.id});
-			});
+        var listbox = win.find('#mpforms_select')[0];
+        jQuery.getJSON(ajaxurl + '?action=mpforms_get_forms', function(data) {
+            listbox.menu = null;
+            jQuery.each(data, function(index, item){
+                listbox.settings.values.push({text:  item.name, value: item.id});
+            });
 
-		});
+        });
 
-		function onSubmitForm() {
-			var data = win.toJSON();
+        function onSubmitForm() {
+            var data = win.toJSON();
 
-			var displayValue = '[mailplusform formid=' + data.mpforms_select + ' /]';
-			editor.selection.setContent(displayValue);
-		}
-	}
+        	var displayValue = '[mailplusform formid=' + data.mpforms_select + ' /]';
+            editor.selection.setContent(displayValue);
+        }
+    }
 
 })();
 
