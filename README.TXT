@@ -3,7 +3,7 @@ Contributors: mailplus
 Donate link: https://www.spotler.com/software
 Tags: forms, mailplus
 Requires at least: 3.9
-Tested up to: 4.8
+Tested up to: 5.8
 Stable tag: trunk
 License: Modified BSD License
 
